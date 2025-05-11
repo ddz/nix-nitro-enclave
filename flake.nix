@@ -2,7 +2,7 @@
   description = "Nix Nitro Enclave";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nitro-util.url = "github:monzo/aws-nitro-util";
   };
 
@@ -17,11 +17,6 @@
 
     enclave = pkgs.callPackage ./nix/enclave.nix { };
     
-    # Add libcbor input to build qemu w/ nitro-enclave machine type
-    qemuNitroEnclave = pkgs.qemu.overrideAttrs (finalAttrs: previousAttrs: {
-      buildInputs = previousAttrs.buildInputs ++ [ pkgs.libcbor ];
-    });
-
     # Usermode vsock backend for development and testing outside of EC2
     vhostDeviceVsock = pkgs.callPackage ./nix/vhost-device-vsock.nix { };
 
@@ -40,7 +35,7 @@
     
     devShells.x86_64-linux.default = pkgs.mkShell {
       buildInputs = [
-        pkgs.go pkgs.socat qemuNitroEnclave vhostDeviceVsock
+        pkgs.go pkgs.socat pkgs.qemu vhostDeviceVsock
       ];
     };
 
